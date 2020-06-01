@@ -4,27 +4,27 @@ Authors : Jérémy Delay & Eloïse Martin
 
 ## Static HTTP server with apache httpd
 
-We chose the same port mapping as the given exemple. The host listens on the 8989 port for clients requests while the container listens on the 80 port (usually default for http).
+We choose the same port mapping as the given exemple. The host listens on the 8989 port for clients requests while the container listens on the 80 port (usually default for http).
 
 ### Step by step to create your HTTP server with apache httpd :
-1. Create a Dockerfile that contains the following lines : <br>
+1. Create a Dockerfile that contains the following lines :  
    ```dockerfile
    FROM httpd:2.4
    RUN apt-get update && apt-get install -y vim nano
    COPY www/ /usr/local/apache2/htdocs/
    ```
-2. Your `www` directory should have the following structure (minimal : <br>
+2. Your `www` directory should have the following structure (minimal) :  
    - www/
      - assets/
        - css/
        - img/
      - index.html
-3. Create two scripts to help with building the image and runing the container. Your build_image.sh should be like this : <br>
+3. Create two scripts to help with building the image and running the container. Your build_image.sh should be like this :  
    ```bash
    #!/bin/bash
    docker build -t http-static-image .
    ```
-   Your run_container.sh should be like this : <br>
+   Your run_container.sh should be like this :  
    ```bash
    #!/bin/bash
    docker run -d -p 8989:80 --name static-srv http-static-image
@@ -38,38 +38,38 @@ We chose the same port mapping as the given exemple. The host listens on the 898
 
 ## Dynamic HTTP server with express.js
 
-We chose the same port mapping as the given exemple. The host listens on the 9090 port for clients requests while the container listens on the 3000 port.
+We choose the same port mapping as the given exemple. The host listens on the 9090 port for clients requests while the container listens on the 3000 port.
 
 ### Step by step to create your HTTP server with express.js :
-1. Download Node.js using the link below : <br>
+1. Download Node.js using the link below :  
    https://nodejs.org/en/
-2. Verify your installaiton by using the command below, if its installed properly it should return your npm version, otherwise you will have an _unknown command_ : <br>
+2. Verify your installaiton by using the command below, if it's installed properly it should return your npm version, otherwise you will have an _unknown command_ :  
    `npm --version`
-3. Create your json package by using the command below : <br>
+3. Create your json package by using the command below :  
    `npm init`
-4. Install express.js module by using the command below : <br>
+4. Install express.js module by using the command below :  
    `npm install express --save`
-5. Run the command below to test your node : <br>
+5. Run the command below to test your node :  
    `node index.js`
 6. Create your random page
-7. Create a Dockerfile that contains the following lines : <br>
+7. Create a Dockerfile that contains the following lines :  
    ```dockerfile
    FROM node:12.16
    RUN apt-get update && apt-get install -y vim nano
    COPY src /opt/app
    CMD ["node", "/opt/app/index.js"]
    ```
-8. Your `src` directory should have the following structure (minimal) : <br>
+8. Your `src` directory should have the following structure (minimal) :  
    - src/
      - node_modules/
      - index.js
      - package.json
-9. Create two scripts to help with building the image and runing the container. Your build_image.sh should be like this : <br>
+9. Create two scripts to help with building the image and running the container. Your build_image.sh should be like this :  
    ```bash
    #!/bin/bash
    docker build -t http-dynamic-image .
    ```
-   Your run_container.sh should be like this : <br>
+   Your run_container.sh should be like this :  
    ```bash
    #!/bin/bash
    docker run -d -p 9090:3000 --name dynamic-srv http-dynamic-image
@@ -88,7 +88,7 @@ We are going to implement a reverse proxy using apache configuration with static
 ### Preliminary steps to create your Apache reverse proxy server :
 1. Run your static server
 2. Run your dynamic server
-3. Check for IP adress : <br>
+3. Check for IP adress :  
    ```bash
    docker inspect static-srv | grep -i ipaddr
    docker inspect dynamic-srv | grep -i ipaddr
@@ -96,7 +96,7 @@ We are going to implement a reverse proxy using apache configuration with static
 4. Use those adresses to configure the redirection in the reverse proxy server
 
 ### Step by step to create your Apache reverse proxy server :
-1. Create a Dockerfile that contains the following lines : <br>
+1. Create a Dockerfile that contains the following lines :  
    ```dockerfile
    FROM php:7.2-apache
    COPY conf/00*.conf /etc/apache2/sites-available/
@@ -104,11 +104,11 @@ We are going to implement a reverse proxy using apache configuration with static
    RUN a2enmod proxy proxy_http
    RUN a2ensite 000-*.conf 001-*.conf
    ```
-2. Your `conf` directory should have the following structure (minimal) : <br>
+2. Your `conf` directory should have the following structure (minimal) :  
    - conf/
      - 000-default.conf
      - 001-reverse-proxy.conf
-3. Your configuration should be likt this : <br>
+3. Your configuration should be likt this :  
    ```conf
    <VirtualHost *:80>
         # Nom du serveur proxy                                             
@@ -124,17 +124,17 @@ We are going to implement a reverse proxy using apache configuration with static
         ## END
    </VirtualHost>
    ```
-4. Create two scripts to help with building the image and runing the container. Your build_image.sh should be like this : <br>
+4. Create two scripts to help with building the image and runing the container. Your build_image.sh should be like this :  
    ```bash
    #!/bin/bash
    docker build -t proxy-static-image .
    ```
-   Your run_container.sh should be like this : <br>
+   Your run_container.sh should be like this :  
    ```bash
    #!/bin/bash
    docker run -p 8080:80 --name static-proxy-srv proxy-static-image
    ```
-5. Create helpers to build/run your images/containers, the script for the static server should be like this : <br>
+5. Create helpers to build/run your images/containers, the script for the static server should be like this :  
    ```bash
    #!/bin/bash
    docker kill static-srv 2> /dev/null
@@ -143,7 +143,7 @@ We are going to implement a reverse proxy using apache configuration with static
    ./run_container.sh
    docker ps
    ```
-   The script for the dynamic server should be like this : <br>
+   The script for the dynamic server should be like this :  
    ```bash
    #!/bin/bash
    docker kill static-proxy-srv 2> /dev/null
@@ -152,7 +152,7 @@ We are going to implement a reverse proxy using apache configuration with static
    ./run_container.sh
    docker ps
    ```
-   The script for the reverse proxy should be like this : <br>
+   The script for the reverse proxy should be like this :  
    ```bash
    #!/bin/bash
    docker kill static-proxy-srv 2> /dev/null
@@ -161,14 +161,14 @@ We are going to implement a reverse proxy using apache configuration with static
    ./run_container.sh
    docker ps
    ```
-6. If you want to test your server from your web browser, make sure to add this line to your /etc/hosts file : <br>
+6. If you want to test your server from your web browser, make sure to add this line to your /etc/hosts file :  
    `127.0.0.1  lab.res.ch`
 
 ### Step by step to run your Apache reverse proxy server :
 Before running those steps, make sure you ahve remove the old port mapping from your static and dynamic servers. The following order is important because of the hardcoded IP adress that are set in your configuration.
 1. Run the [helper.sh](static-image/helper.sh) script to build and run your static server in your static-image directory
-2. Run the [helper.sh](static-image/helper.sh) script to build and run your static server in your static-image directory
-3. Run the [helper.sh](static-image/helper.sh) script to build and run your static server in your static-image directory
+2. Run the [helper.sh](dynamic-image/helper.sh) script to build and run your dynamic server in your dynamic-image directory
+3. Run the [helper.sh](apache-recerse-proxy/helper.sh) script to build and run your static reverse proxy server in your apache-recerse-proxy directory
 4. In a web browser go to your web site : `localhost:8080`
 
 To make sure the data you recieve comes from you new proxy server, press shift + refresh.
@@ -208,6 +208,8 @@ NOTE : In case the browser is not able to acess the page (ERR_EMPTY_RESPONSE), t
    ```
 7. Reload the page and check in the development tools to see if your data is refreshed :<br>
    ![test_refresh](img/test_refresh.png)
+
+[SOP](https://en.wikipedia.org/wiki/Same-origin_policy#:~:text=In%20computing%2C%20the%20same%2Dorigin,pages%20have%20the%20same%20origin.) only allows scripts from same origin to be run. This is why we need a reverse proxy to allow other script source to be executed. SOP is a protection to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting).
 
 ## Dynamic reverse proxy configuration
 
@@ -255,7 +257,7 @@ To test if everything is correct use the helper.sh in the main directory like th
 ./helper.sh kill
 ./helper.sh run
 ```
-Go on lab.res.ch:8080 and watch the magique append.
+Go on lab.res.ch:8080 and watch the magic append.
 
 ## Management UI
 
@@ -265,5 +267,5 @@ Follow the installation instructions [here](https://www.portainer.io/installatio
 
 ## Load balancing
 
-This web server does not implement loand balancing due to lack of time.
-More information to implement load balancing on your server can be found [here](https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html).
+This web server does not implement load balancing due to lack of time.
+More informations to implement load balancing on your server can be found [here](https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html).
