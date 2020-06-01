@@ -1,0 +1,13 @@
+body {
+    font-family: 'Times New Roman', Times, serif;
+    align-items: center;
+}
+  
+.image-500 {
+    size: 500px;
+}
+
+#large-img {
+    width: 1600px;
+    height: 800px;
+}
